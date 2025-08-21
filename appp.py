@@ -31,23 +31,7 @@ st.markdown("""
         box-shadow: 0 6px 15px rgba(75,139,190,0.4);
         margin-bottom: 1.5rem;
     }
-    div[data-testid="fileUploaderDropzone"] {
-        background: #61a0af;
-        border-radius: 12px;
-        padding: 1.2rem;
-        margin-bottom: 0.5rem;
-        border: none;
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(97,160,175,0.5);
-        transition: background-color 0.3s ease;
-    }
-    div[data-testid="fileUploaderDropzone"]:hover {
-        background: #468a96;
-        box-shadow: 0 6px 20px rgba(70,138,150,0.7);
-    }
+  
     img {
         border-radius: 12px;
         box-shadow: 0 6px 18px rgba(0,0,0,0.15);
@@ -279,5 +263,6 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
