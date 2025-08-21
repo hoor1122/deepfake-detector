@@ -189,7 +189,9 @@ transform = transforms.Compose([
 if "uploaded_image" not in st.session_state:
     st.session_state.uploaded_image = None
 
-uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"] 
+key=st.session_state.get("uploader_key", 0) 
+)
 
 # Agar naya file upload hua to session me save karo
 if uploaded_file is not None:
@@ -262,13 +264,16 @@ if st.session_state.uploaded_image is not None:
 
         st.pyplot(fig)
 
-    # ====== CLEAR BUTTON ======
-    if clear:
-        st.session_state.uploaded_image = None
-        st.rerun()
+# ====== CLEAR BUTTON ======
+if clear:
+    st.session_state.uploaded_image = None   # image remove
+    st.session_state.uploader_key = st.session_state.get("uploader_key", 0) + 1  # reset uploader
+    st.rerun()
+
 
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
