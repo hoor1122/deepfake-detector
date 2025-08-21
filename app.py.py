@@ -189,7 +189,7 @@ transform = transforms.Compose([
 if "uploaded_image" not in st.session_state:
     st.session_state.uploaded_image = None
 
-uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"] 
+uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"],
 key=st.session_state.get("uploader_key", 0) 
 )
 
@@ -274,6 +274,7 @@ if clear:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
