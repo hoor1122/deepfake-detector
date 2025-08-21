@@ -30,7 +30,27 @@ st.markdown("""
         text-align: center;
         box-shadow: 0 6px 15px rgba(75,139,190,0.4);
         margin-bottom: 1.5rem;
-    }
+    } 
+
+div[data-testid="fileUploaderDropzone"] {
+    background-color: #4B8BBE !important;  /* blue button color */
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1rem !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 10px rgba(75,139,190,0.4) !important;
+    height: 40px !important;
+    width: 200px !important;  /* button width */
+    margin: auto;  /* center me button */
+}
+
+/* andar ka drag & drop text hide karo */
+div[data-testid="fileUploaderDropzone"] section {
+    display:none !important;
+}
+
   
     img {
         border-radius: 12px;
@@ -263,6 +283,7 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
