@@ -15,8 +15,33 @@ st.set_page_config(
 
 # ====== CUSTOM CSS ======
 st.markdown("""
+<style> 
+# ====== CUSTOM CSS (Uploader ko button banane ke liye) ======
+st.markdown("""
 <style>
-    .stApp {
+/* drag & drop ka text chhupao */
+div[data-testid="fileUploaderDropzone"] section div {
+    display: none !important;
+}
+/* uploader ko button bana do */
+div[data-testid="fileUploaderDropzone"] {
+    background-color: #4B8BBE !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1rem !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 10px rgba(75,139,190,0.4) !important;
+    width: 200px !important;
+    margin: auto;
+}
+div[data-testid="fileUploaderDropzone"]:hover {
+    background-color: #306998 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
         background-color: #f0f7ff;
         color: #222222;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -283,6 +308,7 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
