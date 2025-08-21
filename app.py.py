@@ -258,3 +258,4 @@ if st.session_state.uploaded_image is not None:
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
 
+
