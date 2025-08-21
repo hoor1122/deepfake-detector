@@ -14,12 +14,14 @@ st.set_page_config(
 )
 
 # ====== CUSTOM CSS ======
+# ====== CUSTOM CSS ======
 st.markdown("""
 <style>
 /* drag & drop ka text chhupao */
 div[data-testid="fileUploaderDropzone"] section div {
     display: none !important;
 }
+
 /* uploader ko button bana do */
 div[data-testid="fileUploaderDropzone"] {
     background-color: #4B8BBE !important;
@@ -31,125 +33,118 @@ div[data-testid="fileUploaderDropzone"] {
     cursor: pointer !important;
     box-shadow: 0 4px 10px rgba(75,139,190,0.4) !important;
     width: 200px !important;
+    height: 40px !important;
     margin: auto;
 }
 div[data-testid="fileUploaderDropzone"]:hover {
     background-color: #306998 !important;
 }
+
+/* page background */
+body {
+    background-color: #f0f7ff;
+    color: #222222;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2rem 1rem 4rem 1rem;
+}
+
+/* header */
+.header {
+    background: linear-gradient(90deg, #4B8BBE, #306998);
+    padding: 2rem 1rem;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(75,139,190,0.4);
+    margin-bottom: 1.5rem;
+}
+
+/* image styling */
+img {
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    max-width: 350px;
+    height: auto;
+    display: block;
+    margin: 0 auto 25px auto;
+}
+
+/* result box */
+.result-box {
+    background-color: #e9f0f7;
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 450px;
+    margin: 1.5rem auto;
+    box-shadow: 0 6px 24px rgba(48,105,152,0.25);
+    text-align: center;
+    color: #222222;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+.pred-fake {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(211,47,47,0.3);
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-left: 10px;
+}
+.pred-real {
+    color: #388e3c;
+    background-color: #e8f5e9;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(56,142,60,0.3);
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-left: 10px;
+}
+
+/* tagline */
+.tagline {
+    text-align: center;
+    color: #555555;
+    font-style: italic;
+    margin-top: -10px;
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+/* footer */
+.footer {
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 3rem;
+    color: #555555;
+    font-style: italic;
+}
+
+/* analyze button */
+.analyze-button {
+    display: block;
+    margin: 0 auto 20px auto;
+    background-color: #4B8BBE;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.7rem 2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 5px 15px rgba(75,139,190,0.4);
+    transition: background-color 0.3s ease;
+}
+.analyze-button:hover {
+    background-color: #306998;
+}
 </style>
 """, unsafe_allow_html=True)
 
-        background-color: #f0f7ff;
-        color: #222222;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding: 2rem 1rem 4rem 1rem;
-    }
-    .header {
-        background: linear-gradient(90deg, #4B8BBE, #306998);
-        padding: 2rem 1rem;
-        border-radius: 15px;
-        color: white;
-        text-align: center;
-        box-shadow: 0 6px 15px rgba(75,139,190,0.4);
-        margin-bottom: 1.5rem;
-    } 
-
-div[data-testid="fileUploaderDropzone"] {
-    background-color: #4B8BBE !important;  /* blue button color */
-    color: white !important;
-    border-radius: 8px !important;
-    padding: 0.6rem 1rem !important;
-    text-align: center !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    box-shadow: 0 4px 10px rgba(75,139,190,0.4) !important;
-    height: 40px !important;
-    width: 200px !important;  /* button width */
-    margin: auto;  /* center me button */
-}
-
-/* andar ka drag & drop text hide karo */
-div[data-testid="fileUploaderDropzone"] section {
-    display:none !important;
-}
-
-  
-    img {
-        border-radius: 12px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-        max-width: 350px;
-        height: auto;
-        display: block;
-        margin: 0 auto 25px auto;
-    }
-    .result-box {
-        background-color: #e9f0f7;
-        border-radius: 15px;
-        padding: 2rem;
-        max-width: 450px;
-        margin: 1.5rem auto;
-        box-shadow: 0 6px 24px rgba(48,105,152,0.25);
-        text-align: center;
-        color: #222222;
-        font-weight: 600;
-        font-size: 1.2rem;
-    }
-    .pred-fake {
-        color: #d32f2f;
-        background-color: #ffebee;
-        padding: 0.3rem 1rem;
-        border-radius: 20px;
-        box-shadow: 0 3px 10px rgba(211,47,47,0.3);
-        display: inline-block;
-        font-weight: 700;
-        font-size: 1.4rem;
-        margin-left: 10px;
-    }
-    .pred-real {
-        color: #388e3c;
-        background-color: #e8f5e9;
-        padding: 0.3rem 1rem;
-        border-radius: 20px;
-        box-shadow: 0 3px 10px rgba(56,142,60,0.3);
-        display: inline-block;
-        font-weight: 700;
-        font-size: 1.4rem;
-        margin-left: 10px;
-    }
-    .tagline {
-        text-align: center;
-        color: #555555;
-        font-style: italic;
-        margin-top: -10px;
-        margin-bottom: 25px;
-        font-size: 1rem;
-    }
-    .footer {
-        font-size: 0.85rem;
-        text-align: center;
-        margin-top: 3rem;
-        color: #555555;
-        font-style: italic;
-    }
-    .analyze-button {
-        display: block;
-        margin: 0 auto 20px auto;
-        background-color: #4B8BBE;
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        padding: 0.7rem 2rem;
-        border-radius: 10px;
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 5px 15px rgba(75,139,190,0.4);
-        transition: background-color 0.3s ease;
-    }
-    .analyze-button:hover {
-        background-color: #306998;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 # ====== HEADER ======
 st.markdown("""
@@ -212,31 +207,8 @@ transform = transforms.Compose([
 
 # ====== FILE UPLOAD (with button) ======
 
-# ====== FILE UPLOAD (Upload Button Only) ======
 
-# Custom CSS to hide drag-drop and show only button style
-st.markdown("""
-    <style>
-    /* Hide drag & drop text */
-    div[data-testid="fileUploaderDropzone"] section div {
-        display: none;
-    }
-    /* Make uploader look like a button */
-    div[data-testid="fileUploaderDropzone"] {
-        background-color: #4B8BBE;
-        color: white;
-        border-radius: 8px;
-        padding: 0.6rem 1rem;
-        text-align: center;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(75,139,190,0.4);
-    }
-    div[data-testid="fileUploaderDropzone"]:hover {
-        background-color: #306998;
-    }
-    </style>
-""", unsafe_allow_html=True)
+
 
 uploaded_file = st.file_uploader("📤 Upload Image", type=["jpg", "jpeg", "png"])
 
@@ -305,6 +277,7 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
