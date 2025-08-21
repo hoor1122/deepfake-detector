@@ -185,7 +185,15 @@ transform = transforms.Compose([
 ])
 
 # ====== FILE UPLOAD ======
+# ====== FILE UPLOAD + SESSION ======
+if "uploaded_image" not in st.session_state:
+    st.session_state.uploaded_image = None
+
 uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"])
+
+# Agar naya file upload hua to session me save karo
+if uploaded_file is not None:
+    st.session_state.uploaded_image = Image.open(uploaded_file).convert("RGB")
 
 # Tagline below uploader
 st.markdown(
@@ -193,15 +201,22 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert("RGB")
+# Agar image available hai to dikhaye aur buttons show kare
+if st.session_state.uploaded_image is not None:
+    image = st.session_state.uploaded_image
     st.image(image, caption='🖼 Uploaded Image')
 
-    # Analyze button
-    analyze = st.button("Analyze")
+    # Buttons ek line me
+    col1, col2 = st.columns(2)
 
+    with col1:
+        analyze = st.button("🔍 Analyze")
+
+    with col2:
+        clear = st.button("🗑️ Clear")
+
+    # ====== ANALYZE BUTTON ======
     if analyze:
-        # Show spinner + progress bar while predicting
         with st.spinner("Analyzing picture..."):
             progress_bar = st.progress(0)
             img_tensor = transform(image).unsqueeze(0).to("cpu")
@@ -221,7 +236,6 @@ if uploaded_file is not None:
             progress_bar.progress(100)
             time.sleep(0.2)
 
-        # Display prediction and confidence
         color_class = "pred-real" if pred_class == "Real" else "pred-fake"
 
         st.markdown(
@@ -234,14 +248,13 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
-        # --- Probability distribution graph ---
+        # Probability distribution graph
         fig, ax = plt.subplots()
         bars = ax.bar(class_names, probs * 100, color=['#d32f2f', '#388e3c'])
         ax.set_ylim([0, 100])
         ax.set_ylabel('Probability (%)')
         ax.set_title('Prediction Probability Distribution')
 
-        # Add data labels on top of bars
         for bar in bars:
             height = bar.get_height()
             ax.annotate(f'{height:.2f}%', xy=(bar.get_x() + bar.get_width() / 2, height),
@@ -249,6 +262,13 @@ if uploaded_file is not None:
 
         st.pyplot(fig)
 
+    # ====== CLEAR BUTTON ======
+    if clear:
+        st.session_state.uploaded_image = None
+        st.rerun()
+
+
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
