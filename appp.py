@@ -15,9 +15,6 @@ st.set_page_config(
 
 # ====== CUSTOM CSS ======
 st.markdown("""
-<style> 
-# ====== CUSTOM CSS (Uploader ko button banane ke liye) ======
-st.markdown("""
 <style>
 /* drag & drop ka text chhupao */
 div[data-testid="fileUploaderDropzone"] section div {
@@ -308,6 +305,7 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
