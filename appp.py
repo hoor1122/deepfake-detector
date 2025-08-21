@@ -184,8 +184,18 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-# ====== FILE UPLOAD ======
-uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"])
+# ====== FILE UPLOAD (with button) ======
+
+if "show_uploader" not in st.session_state:
+    st.session_state.show_uploader = False
+
+if st.button("📤 Upload Image"):
+    st.session_state.show_uploader = True
+
+uploaded_file = None
+if st.session_state.show_uploader:
+    uploaded_file = st.file_uploader("Choose an image file", type=["jpg", "jpeg", "png"])
+
 
 # Tagline below uploader
 st.markdown(
@@ -251,3 +261,4 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
