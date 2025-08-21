@@ -218,51 +218,69 @@ if st.session_state.uploaded_image is not None:
         clear = st.button("🗑️ Clear")
 
     # ====== ANALYZE BUTTON ======
-    if analyze:
-        with st.spinner("Analyzing picture..."):
-            progress_bar = st.progress(0)
-            img_tensor = transform(image).unsqueeze(0).to("cpu")
+# ====== ANALYZE BUTTON ======
+if analyze:
+    with st.spinner("Analyzing picture..."):
+        progress_bar = st.progress(0)
+        img_tensor = transform(image).unsqueeze(0).to("cpu")
 
-            for percent in range(0, 101, 20):
-                time.sleep(0.15)
-                progress_bar.progress(percent)
+        for percent in range(0, 101, 20):
+            time.sleep(0.15)
+            progress_bar.progress(percent)
 
-            with torch.no_grad():
-                outputs = model(img_tensor)
-                probs = torch.softmax(outputs, dim=1)[0].cpu().numpy()
-                _, predicted = torch.max(outputs, 1)
-                class_names = ['Fake', 'Real']
-                pred_class = class_names[predicted.item()]
-                confidence = probs[predicted.item()] * 100
+        # ====== TEENO MODELS LOAD & PREDICT ======
+        models_dict = {
+            "Fine-Tuned ShuffleNetV2": load_finetuned_shufflenet(),
+            "ShuffleNetV2": load_shufflenet(),
+            "CNN": load_cnn()
+        }
 
-            progress_bar.progress(100)
-            time.sleep(0.2)
+        class_names = ['Fake', 'Real']
+        results = {}  # store probs for all models
+        predictions_text = ""
 
-        color_class = "pred-real" if pred_class == "Real" else "pred-fake"
+        with torch.no_grad():
+            for name, m in models_dict.items():
+                output = m(img_tensor)
+                probs = torch.softmax(output, dim=1)[0].cpu().numpy()
+                results[name] = probs
+                pred_idx = probs.argmax()
+                pred_class = class_names[pred_idx]
+                confidence = probs[pred_idx] * 100
+                predictions_text += f"**{name}**: {pred_class} ({confidence:.2f}%)<br>"
 
-        st.markdown(
-            f"""
-            <div class="result-box">
-                <span>🧠 Prediction:</span> <span class="{color_class}">{pred_class}</span>
-                <p>Confidence: <strong>{confidence:.2f}%</strong></p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        progress_bar.progress(100)
+        time.sleep(0.2)
 
-        # Probability distribution graph
-        fig, ax = plt.subplots()
-        bars = ax.bar(class_names, probs * 100, color=['#d32f2f', '#388e3c'])
-        ax.set_ylim([0, 100])
-        ax.set_ylabel('Probability (%)')
-        ax.set_title('Prediction Probability Distribution')
+    # ====== SHOW TEXT PREDICTIONS ======
+    st.markdown(
+        f"""
+        <div class="result-box">
+            <span>🧠 Predictions:</span><br>{predictions_text}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        for bar in bars:
-            height = bar.get_height()
-            ax.annotate(f'{height:.2f}%', xy=(bar.get_x() + bar.get_width() / 2, height),
-                        xytext=(0, 3), textcoords="offset points", ha='center', va='bottom')
+    # ====== GROUPED BAR CHART ======
+    import numpy as np
 
-        st.pyplot(fig)
+    fig, ax = plt.subplots()
+    labels = class_names
+    x = np.arange(len(labels))
+    width = 0.25
+
+    for i, (model_name, probs) in enumerate(results.items()):
+        ax.bar(x + i*width, probs*100, width, label=model_name)
+
+    ax.set_xticks(x + width)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel('Probability (%)')
+    ax.set_title('All Models Prediction Comparison')
+    ax.set_ylim([0, 100])
+    ax.legend()
+
+    st.pyplot(fig)
 
 # ====== CLEAR BUTTON ======
 if clear:
@@ -274,6 +292,7 @@ if clear:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
