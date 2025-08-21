@@ -186,22 +186,40 @@ transform = transforms.Compose([
 
 # ====== FILE UPLOAD (with button) ======
 
-if "show_uploader" not in st.session_state:
-    st.session_state.show_uploader = False
+# ====== FILE UPLOAD (Upload Button Only) ======
 
-if st.button("📤 Upload Image"):
-    st.session_state.show_uploader = True
+# Custom CSS to hide drag-drop and show only button style
+st.markdown("""
+    <style>
+    /* Hide drag & drop text */
+    div[data-testid="fileUploaderDropzone"] section div {
+        display: none;
+    }
+    /* Make uploader look like a button */
+    div[data-testid="fileUploaderDropzone"] {
+        background-color: #4B8BBE;
+        color: white;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        text-align: center;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(75,139,190,0.4);
+    }
+    div[data-testid="fileUploaderDropzone"]:hover {
+        background-color: #306998;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-uploaded_file = None
-if st.session_state.show_uploader:
-    uploaded_file = st.file_uploader("Choose an image file", type=["jpg", "jpeg", "png"])
-
+uploaded_file = st.file_uploader("📤 Upload Image", type=["jpg", "jpeg", "png"])
 
 # Tagline below uploader
 st.markdown(
     '<p class="tagline">Upload a face image to detect deepfakes — stay aware!</p>',
     unsafe_allow_html=True
 )
+
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
@@ -261,4 +279,5 @@ if uploaded_file is not None:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
