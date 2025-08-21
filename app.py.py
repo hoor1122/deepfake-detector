@@ -31,22 +31,8 @@ st.markdown("""
         box-shadow: 0 6px 15px rgba(75,139,190,0.4);
         margin-bottom: 1.5rem;
     }
-    div[data-testid="fileUploaderDropzone"] {
-        background: #61a0af;
-        border-radius: 12px;
-        padding: 1.2rem;
-        margin-bottom: 0.5rem;
-        border: none;
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(97,160,175,0.5);
-        transition: background-color 0.3s ease;
-    }
-    div[data-testid="fileUploaderDropzone"]:hover {
-        background: #468a96;
-        box-shadow: 0 6px 20px rgba(70,138,150,0.7);
+    div.stFileUploader {
+        display: none;  /* Hide default uploader */
     }
     img {
         border-radius: 12px;
@@ -105,21 +91,22 @@ st.markdown("""
         color: #555555;
         font-style: italic;
     }
-    .analyze-button {
+    .custom-button {
         display: block;
-        margin: 0 auto 20px auto;
+        width: 100%;
         background-color: #4B8BBE;
         color: white;
         font-weight: 600;
         font-size: 1.1rem;
-        padding: 0.7rem 2rem;
+        padding: 0.7rem 0;
         border-radius: 10px;
         cursor: pointer;
         border: none;
         box-shadow: 0 5px 15px rgba(75,139,190,0.4);
         transition: background-color 0.3s ease;
+        text-align: center;
     }
-    .analyze-button:hover {
+    .custom-button:hover {
         background-color: #306998;
     }
 </style>
@@ -145,8 +132,8 @@ def load_finetuned_shufflenet():
     model = models.shufflenet_v2_x1_0(pretrained=False)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 2)
-    model.load_state_dict(torch.load("best_shufflenet.pth", map_location=torch.device("cpu")))
-    model.to(torch.device("cpu"))
+    model.load_state_dict(torch.load("best_shufflenet.pth", map_location="cpu"))
+    model.to("cpu")
     model.eval()
     return model
 
@@ -154,8 +141,8 @@ def load_finetuned_shufflenet():
 def load_shufflenet():
     model = models.shufflenet_v2_x1_0(pretrained=True)
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 2)  # Dummy 2-class output
-    model.to(torch.device("cpu"))
+    model.fc = nn.Linear(num_ftrs, 2)
+    model.to("cpu")
     model.eval()
     return model
 
@@ -163,8 +150,8 @@ def load_shufflenet():
 def load_cnn():
     model = models.resnet18(pretrained=True)
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 2)  # Dummy 2-class output
-    model.to(torch.device("cpu"))
+    model.fc = nn.Linear(num_ftrs, 2)
+    model.to("cpu")
     model.eval()
     return model
 
@@ -173,7 +160,7 @@ if model_choice == "Fine-Tuned ShuffleNetV2":
     model = load_finetuned_shufflenet()
 elif model_choice == "ShuffleNetV2":
     model = load_shufflenet()
-elif model_choice == "CNN":
+else:
     model = load_cnn()
 
 # ====== IMAGE TRANSFORM ======
@@ -184,41 +171,44 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-# ====== FILE UPLOAD ======
-# ====== FILE UPLOAD + SESSION ======
+# ====== SESSION STATE ======
 if "uploaded_image" not in st.session_state:
     st.session_state.uploaded_image = None
+if "uploader_key" not in st.session_state:
+    st.session_state.uploader_key = 0
 
-uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"],
-    key=st.session_state.get("uploader_key", 0)  # yeh line add karein
-)
+# ====== CUSTOM UPLOAD & CLEAR BUTTONS SIDE BY SIDE ======
+col1, col2 = st.columns([1,1])
 
+with col1:
+    clear = st.button("🗑️ Clear", key="clear_btn")
+    if clear:
+        st.session_state.uploaded_image = None
+        st.session_state.uploader_key += 1
+        st.experimental_rerun()
 
-# Agar naya file upload hua to session me save karo
-if uploaded_file is not None:
-    st.session_state.uploaded_image = Image.open(uploaded_file).convert("RGB")
+with col2:
+    uploaded_file = st.file_uploader(
+        "📤 Upload Image",
+        type=["jpg", "jpeg", "png"],
+        key=f"uploader_{st.session_state.uploader_key}"
+    )
+    if uploaded_file is not None:
+        st.session_state.uploaded_image = Image.open(uploaded_file).convert("RGB")
 
-# Tagline below uploader
+# ====== TAGLINE ======
 st.markdown(
     '<p class="tagline">Upload a face image to detect deepfakes — stay aware!</p>',
     unsafe_allow_html=True
 )
 
-# Agar image available hai to dikhaye aur buttons show kare
+# ====== DISPLAY IMAGE + ANALYZE BUTTON ======
 if st.session_state.uploaded_image is not None:
     image = st.session_state.uploaded_image
     st.image(image, caption='🖼 Uploaded Image')
 
-    # Buttons ek line me
-    col1, col2 = st.columns(2)
+    analyze = st.button("🔍 Analyze")
 
-    with col1:
-        analyze = st.button("🔍 Analyze")
-
-    with col2:
-        clear = st.button("🗑️ Clear")
-
-    # ====== ANALYZE BUTTON ======
     if analyze:
         with st.spinner("Analyzing picture..."):
             progress_bar = st.progress(0)
@@ -265,16 +255,5 @@ if st.session_state.uploaded_image is not None:
 
         st.pyplot(fig)
 
-    # ====== CLEAR BUTTON ======
-if clear:
-    st.session_state.uploaded_image = None   # image remove
-    st.session_state.uploader_key = st.session_state.get("uploader_key", 0) + 1  # reset uploader
-    st.rerun()
-
-
-
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
-
-
-
