@@ -137,3 +137,4 @@ with col2:
                 ax.annotate(f'{height:.2f}%', xy=(bar.get_x()+bar.get_width()/2, height), xytext=(0,3), textcoords="offset points", ha='center')
             st.pyplot(fig)
 
+
