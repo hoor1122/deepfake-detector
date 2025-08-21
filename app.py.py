@@ -278,3 +278,4 @@ st.markdown("<div class='footer'>🔍 This result is based on the uploaded image
 
 
 
+
