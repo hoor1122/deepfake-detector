@@ -212,13 +212,13 @@ if st.session_state.uploaded_image is not None:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-    analyze = st.button("🔍 Analyze (Selected Model)")
+        analyze = st.button("🔍 Analyze (Selected Model)")
 
     with col2:
-    all_models = st.button("🧠 All Models Compare")
+        all_models = st.button("🧠 All Models Compare")
 
     with col3:
-    clear = st.button("🗑️ Clear")
+        clear = st.button("🗑️ Clear")
 
 
     # ====== ANALYZE BUTTON ======
@@ -383,6 +383,7 @@ if clear:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
