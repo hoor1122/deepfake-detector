@@ -184,20 +184,19 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-# ====== FILE UPLOAD ======
 # ====== FILE UPLOAD + SESSION ======
 if "uploaded_image" not in st.session_state:
     st.session_state.uploaded_image = None
 
-uploaded_file = st.file_uploader("📤 Choose an image file", type=["jpg", "jpeg", "png"],
-key=st.session_state.get("uploader_key", 0) 
+uploaded_file = st.file_uploader(
+    "📤 Choose an image file", type=["jpg", "jpeg", "png"],
+    key=st.session_state.get("uploader_key", 0)
 )
 
-# Agar naya file upload hua to session me save karo
 if uploaded_file is not None:
     st.session_state.uploaded_image = Image.open(uploaded_file).convert("RGB")
 
-# Tagline below uploader
+# Tagline
 st.markdown(
     '<p class="tagline">Upload a face image to detect deepfakes — stay aware!</p>',
     unsafe_allow_html=True
@@ -208,198 +207,121 @@ if st.session_state.uploaded_image is not None:
     image = st.session_state.uploaded_image
     st.image(image, caption='🖼 Uploaded Image')
 
-    # Buttons ek line me
     col1, col2, col3 = st.columns(3)
-
     with col1:
         analyze = st.button("🔍 Analyze (Selected Model)")
-
     with col2:
         all_models = st.button("🧠 All Models Compare")
-
     with col3:
         clear = st.button("🗑️ Clear")
 
-
     # ====== ANALYZE BUTTON ======
-# ====== ANALYZE BUTTON ======
-# ====== ANALYZE BUTTON (Selected Model)
-# ====== ANALYZE BUTTON (Selected Model) ======
-if analyze:
-    with st.spinner(f"Analyzing picture with {model_choice}..."):
-        progress_bar = st.progress(0)
-        img_tensor = transform(image).unsqueeze(0).to("cpu")
+    if analyze:
+        with st.spinner(f"Analyzing picture with {model_choice}..."):
+            progress_bar = st.progress(0)
+            img_tensor = transform(image).unsqueeze(0).to("cpu")
 
-        for percent in range(0, 101, 20):
-            time.sleep(0.15)
-            progress_bar.progress(percent)
+            for percent in range(0, 101, 20):
+                time.sleep(0.15)
+                progress_bar.progress(percent)
 
-        # 8 spaces (4 for if, 4 for spinner)
-        class_names = ['Fake', 'Real']
+            class_names = ['Fake', 'Real']
+            with torch.no_grad():
+                output = model(img_tensor)
+                probs = torch.softmax(output, dim=1)[0].cpu().numpy()
+                pred_idx = probs.argmax()
+                pred_class = class_names[pred_idx]
+                confidence = probs[pred_idx] * 100
 
-        # 8 spaces indentation
-        with torch.no_grad():
-            # 12 spaces (inside spinner + inside torch.no_grad)
-            output = model(img_tensor)
-            probs = torch.softmax(output, dim=1)[0].cpu().numpy()
-            pred_idx = probs.argmax()
-            pred_class = class_names[pred_idx]
-            confidence = probs[pred_idx] * 100
+            progress_bar.progress(100)
+            time.sleep(0.2)
 
+        st.markdown(
+            f"""
+            <div class="result-box">
+                <span>🧠 Prediction:</span><br>
+                **{model_choice}**: {pred_class} ({confidence:.2f}%)
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
+        # Graph
+        fig, ax = plt.subplots()
+        ax.bar(class_names, probs*100, color=['red', 'green'])
+        ax.set_ylabel('Probability (%)')
+        ax.set_title(f'{model_choice} Prediction')
+        ax.set_ylim([0, 100])
+        st.pyplot(fig)
 
-        progress_bar.progress(100)
-        time.sleep(0.2)
-
-    # Show result
-    st.markdown(
-        f"""
-        <div class="result-box">
-            <span>🧠 Prediction:</span><br>
-            **{model_choice}**: {pred_class} ({confidence:.2f}%)
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Graph for selected model
-    fig, ax = plt.subplots()
-    ax.bar(class_names, probs*100, color=['red', 'green'])
-    ax.set_ylabel('Probability (%)')
-    ax.set_title(f'{model_choice} Prediction')
-    ax.set_ylim([0, 100])
-    st.pyplot(fig)
     # ====== ALL MODELS BUTTON ======
-if all_models:
-    with st.spinner("Analyzing picture with all models..."):
-        progress_bar = st.progress(0)
-        img_tensor = transform(image).unsqueeze(0).to("cpu")
+    if all_models:
+        with st.spinner("Analyzing picture with all models..."):
+            progress_bar = st.progress(0)
+            img_tensor = transform(image).unsqueeze(0).to("cpu")
 
-        for percent in range(0, 101, 20):
-            time.sleep(0.15)
-            progress_bar.progress(percent)
+            for percent in range(0, 101, 20):
+                time.sleep(0.15)
+                progress_bar.progress(percent)
 
-        models_dict = {
-            "Fine-Tuned ShuffleNetV2": load_finetuned_shufflenet(),
-            "ShuffleNetV2": load_shufflenet(),
-            "CNN": load_cnn()
-        }
+            models_dict = {
+                "Fine-Tuned ShuffleNetV2": load_finetuned_shufflenet(),
+                "ShuffleNetV2": load_shufflenet(),
+                "CNN": load_cnn()
+            }
 
-        class_names = ['Fake', 'Real']
-        results = {}
-        predictions_text = ""
+            class_names = ['Fake', 'Real']
+            results = {}
+            predictions_text = ""
 
-        with torch.no_grad():
-            for name, m in models_dict.items():
-                output = m(img_tensor)
-                probs = torch.softmax(output, dim=1)[0].cpu().numpy()
-                results[name] = probs
-                pred_idx = probs.argmax()
-                pred_class = class_names[pred_idx]
-                confidence = probs[pred_idx] * 100
-                predictions_text += f"**{name}**: {pred_class} ({confidence:.2f}%)<br>"
+            with torch.no_grad():
+                for name, m in models_dict.items():
+                    output = m(img_tensor)
+                    probs = torch.softmax(output, dim=1)[0].cpu().numpy()
+                    results[name] = probs
+                    pred_idx = probs.argmax()
+                    pred_class = class_names[pred_idx]
+                    confidence = probs[pred_idx] * 100
+                    predictions_text += f"**{name}**: {pred_class} ({confidence:.2f}%)<br>"
 
-        progress_bar.progress(100)
-        time.sleep(0.2)
+            progress_bar.progress(100)
+            time.sleep(0.2)
 
-    # Show predictions
-    st.markdown(
-        f"""
-        <div class="result-box">
-            <span>🧠 Predictions:</span><br>{predictions_text}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        st.markdown(
+            f"""
+            <div class="result-box">
+                <span>🧠 Predictions:</span><br>{predictions_text}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    # Grouped bar chart
-    import numpy as np
-    fig, ax = plt.subplots()
-    labels = class_names
-    x = np.arange(len(labels))
-    width = 0.25
+        # Grouped chart
+        import numpy as np
+        fig, ax = plt.subplots()
+        labels = class_names
+        x = np.arange(len(labels))
+        width = 0.25
 
-    for i, (model_name, probs) in enumerate(results.items()):
-        ax.bar(x + i*width, probs*100, width, label=model_name)
+        for i, (model_name, probs) in enumerate(results.items()):
+            ax.bar(x + i*width, probs*100, width, label=model_name)
 
-    ax.set_xticks(x + width)
-    ax.set_xticklabels(labels)
-    ax.set_ylabel('Probability (%)')
-    ax.set_title('All Models Prediction Comparison')
-    ax.set_ylim([0, 100])
-    ax.legend()
-    st.pyplot(fig)
+        ax.set_xticks(x + width)
+        ax.set_xticklabels(labels)
+        ax.set_ylabel('Probability (%)')
+        ax.set_title('All Models Prediction Comparison')
+        ax.set_ylim([0, 100])
+        ax.legend()
+        st.pyplot(fig)
 
-
-
-        class_names = ['Fake', 'Real']
-        results = {}  # store probs for all models
-        predictions_text = ""
-
-        with torch.no_grad():
-            for name, m in models_dict.items():
-                output = m(img_tensor)
-                probs = torch.softmax(output, dim=1)[0].cpu().numpy()
-                results[name] = probs
-                pred_idx = probs.argmax()
-                pred_class = class_names[pred_idx]
-                confidence = probs[pred_idx] * 100
-                predictions_text += f"**{name}**: {pred_class} ({confidence:.2f}%)<br>"
-
-        progress_bar.progress(100)
-        time.sleep(0.2)
-
-    # ====== SHOW TEXT PREDICTIONS ======
-    st.markdown(
-        f"""
-        <div class="result-box">
-            <span>🧠 Predictions:</span><br>{predictions_text}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # ====== GROUPED BAR CHART ======
-    import numpy as np
-
-    fig, ax = plt.subplots()
-    labels = class_names
-    x = np.arange(len(labels))
-    width = 0.25
-
-    for i, (model_name, probs) in enumerate(results.items()):
-        ax.bar(x + i*width, probs*100, width, label=model_name)
-
-    ax.set_xticks(x + width)
-    ax.set_xticklabels(labels)
-    ax.set_ylabel('Probability (%)')
-    ax.set_title('All Models Prediction Comparison')
-    ax.set_ylim([0, 100])
-    ax.legend()
-
-    st.pyplot(fig)
-
-# ====== CLEAR BUTTON ======
-if clear:
-    st.session_state.uploaded_image = None   # image remove
-    st.session_state.uploader_key = st.session_state.get("uploader_key", 0) + 1  # reset uploader
-    st.rerun()
-
-
+    # ====== CLEAR BUTTON ======
+    if clear:
+        st.session_state.uploaded_image = None
+        st.session_state.uploader_key = st.session_state.get("uploader_key", 0) + 1
+        st.rerun()
 
 # ====== FOOTER ======
-st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+st.markdown(
+    "<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>",
+    unsafe_allow_html=True
+)
