@@ -223,7 +223,8 @@ if st.session_state.uploaded_image is not None:
 
     # ====== ANALYZE BUTTON ======
 # ====== ANALYZE BUTTON ======
-# ====== ANALYZE BUTTON (Selected Model) ======
+# ====== ANALYZE BUTTON (Selected Model)
+
 if analyze:
     with st.spinner(f"Analyzing picture with {model_choice}..."):
         progress_bar = st.progress(0)
@@ -232,7 +233,6 @@ if analyze:
         for percent in range(0, 101, 20):
             time.sleep(0.15)
             progress_bar.progress(percent)
-
         class_names = ['Fake', 'Real']
 
         with torch.no_grad():
@@ -383,6 +383,7 @@ if clear:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
