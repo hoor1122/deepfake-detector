@@ -233,13 +233,19 @@ if analyze:
         for percent in range(0, 101, 20):
             time.sleep(0.15)
             progress_bar.progress(percent)
-       class_names = ['Fake', 'Real']
-       with torch.no_grad():
+
+        # 8 spaces (4 for if, 4 for spinner)
+        class_names = ['Fake', 'Real']
+
+        # 8 spaces indentation
+        with torch.no_grad():
+            # 12 spaces (inside spinner + inside torch.no_grad)
             output = model(img_tensor)
             probs = torch.softmax(output, dim=1)[0].cpu().numpy()
             pred_idx = probs.argmax()
             pred_class = class_names[pred_idx]
             confidence = probs[pred_idx] * 100
+
 
 
         progress_bar.progress(100)
@@ -383,6 +389,7 @@ if clear:
 
 # ====== FOOTER ======
 st.markdown("<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>", unsafe_allow_html=True)
+
 
 
 
