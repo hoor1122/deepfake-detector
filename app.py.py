@@ -108,7 +108,7 @@ st.markdown("""
     .analyze-button {
         display: block;
         margin: 0 auto 20px auto;
-        background-color: #4B8BBE;
+        background-color:#e64a19;
         color: white;
         font-weight: 600;
         font-size: 1.1rem;
@@ -325,4 +325,5 @@ st.markdown(
     "<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>",
     unsafe_allow_html=True
 )
+
 
