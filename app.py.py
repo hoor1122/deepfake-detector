@@ -109,7 +109,7 @@ st.markdown("""
         display: block;
         margin: 0 auto 20px auto;
         background-color:#ff5722;
-        color: white;
+        color: red;
         font-weight: 600;
         font-size: 1.1rem;
         padding: 0.7rem 2rem;
@@ -325,6 +325,7 @@ st.markdown(
     "<div class='footer'>🔍 This result is based on the uploaded image and may not be perfect. Always verify with additional tools.</div>",
     unsafe_allow_html=True
 )
+
 
 
 
